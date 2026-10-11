@@ -170,10 +170,7 @@ class ZendureStats:
 
         # Calibration happens when the battery reaches 100 %
         soc = c.soc
-        if soc >= 100 and (
-            (self._last_soc is not None and self._last_soc < 100)
-            or (self._last_soc is None and self.last_calibration is None)
-        ):
+        if soc >= 100 and self._last_soc is not None and self._last_soc < 100:
             self.last_calibration = dt_util.now().isoformat()
         self._last_soc = soc
 

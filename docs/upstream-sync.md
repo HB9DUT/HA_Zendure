@@ -140,6 +140,68 @@ erhalten bleiben.
 5. Anwender: In HACS aktualisieren, Home Assistant neu starten. Bei geändertem Dashboard die neue
    Datei einsetzen.
 
+## Bewusste Abweichungen vom Original
+
+Diese Stellen sind **absichtlich** anders als im Original. Sie nicht als Fehler „zurückportieren“,
+sondern bei einer Änderung des Originals bewusst entscheiden.
+
+**Regelung (`controller.py`)**
+- Alle Bedingungen und Regeln mit `dynamic_*` (Dynamic-Modi, „Dynamic charging/discharging check“,
+  `dynamic_charging_running`, `dynamic_discharging_running`, Nordpool-Sensoren) fehlen. Wo sie im Original
+  „aus“ sein müssen, ist die Bedingung bei uns immer erfüllt.
+- *Manual* bei 0 W: Das Original hat zwei Regeln, die bei 0 W abwechselnd greifen (Laden und Entladen
+  umschalten). Bei uns: positiv = laden, negativ = entladen, 0 = stoppen. Geprüft wird nur das jeweils
+  relevante Limit (das andere bliebe sonst bei jedem Durchlauf ungleich und würde endlos geschrieben).
+- Die Bedingung `this.attributes.current == 0` beim Laden-Ausgleichen (verhindert überlappende Läufe) gibt
+  es nicht. Stattdessen verhindert ein `_busy`-Schutz, dass sich zwei Durchläufe überlappen.
+- „Zustand seit n Sekunden“ (z. B. 9 s Laden, Standby seit n Minuten, Quick-Korrektur nach 10 s,
+  Netzmesser seit 60 s weg) ist selbst nachgebildet (`_held`, `_charging_mode_since`). Das Original nutzt
+  die `for:`-Bedingung von Home Assistant.
+- Der Abgleich von SoC-Grenzen, Leistungen und PV-Export (`_sync_device_settings`) schreibt alle
+  abweichenden Werte in **einem** Aufruf und ist nicht exklusiv. Im Original sind es getrennte Regeln
+  innerhalb von `choose` (nur eine pro Durchlauf).
+- Der Netzmesser ist eine frei wählbare Entity (Konfiguration der Integration), nicht ein im Package
+  gebauter `home_energy_meter_power` aus HomeWizard oder eigenem Sensor.
+- Die Standard-Schwellen („Set default settings“) setzen wir bei der Einrichtung nicht automatisch,
+  ausser über den Button. Das Original setzt sie auch bei Änderung der IP-Adresse.
+- Beim ersten Start übernehmen wir Min/Max-SoC, Maximalleistungen und PV-Export aus dem Gerät, alle
+  anderen Einstellungen sind die empfohlenen Defaults (`RECOMMENDED_DEFAULTS`). Die Werte liegen im
+  Speicher der Integration (`.storage`), nicht in Helfern.
+- Abfrageintervall 2 s (einstellbar), Original 1 s. Die Regelung läuft wie im Original alle 5 s.
+
+**Sensoren und Statistik (`coordinator.py`, `sensor.py`, `stats.py`)**
+- Der 24h-Wirkungsgrad ist ein arithmetischer Mittelwert über Stichproben bei jeder Wertänderung (wie
+  der `statistics`-Sensor des Originals) und kein zeitgewichteter Mittelwert. Dass er im Leerlauf oft unter
+  70 % liegt und dann der RTE-Rückfall greift, ist so gewollt.
+- Gibt es weder einen brauchbaren 24h-Wirkungsgrad noch RTE, rechnet die Energie-Indikation ohne Verluste
+  (100 %). Das Original würde 0 bzw. keinen Wert liefern.
+- `Last Calibration` wird nur gesetzt, wenn der Ladestand von unter 100 % auf 100 % steigt, nicht beim
+  ersten Start.
+- Die Sensoren `Relay Switches Charging/Discharging Today` haben `state_class: measurement` (sonst meldet
+  Home Assistant einen Reparaturhinweis wegen der alten Statistik).
+- Die Batterie-Reihenfolge ist eine Option der Integration statt eines Textfelds.
+
+**Dashboard (`tools/port_dashboard.py`)**
+- PV-Karten erscheinen nur, wenn `sensor.zendure_pv_import` grösser als 0 ist (Original: Schalter).
+- Schwellen-Marken (`annotations`, 55 °C und 100 Relais-Wechsel) sind als gestrichelte Reihen gezeichnet,
+  weil die Marken in den Karten bei 0 statt am Wert standen.
+- Der Heartbeat der Geräte-Karte nutzt `last_reported` von `sensor.zendure_power`.
+- Die Gerätebilder liefert die Integration selbst unter `/zendure_zensdk/`.
+
+## Entwicklungsumgebung
+
+Für Dashboard-Skript und Simulation (Python 3.12 oder neuer):
+
+```
+python -m venv .venv
+.venv/Scripts/pip install homeassistant pyyaml        # Windows; unter Linux: .venv/bin/pip
+```
+
+Aufruf jeweils aus dem Repo-Stamm mit `PYTHONPATH=.` (siehe oben). Das Icon im Ordner `brand/` wurde
+einmalig mit Pillow aus dem Bild `V2_SF_3000_4000_Mix.png` des Originals erzeugt und wird nicht
+automatisch neu gebaut; bei einem neuen Icon die Grössen aus der Home-Assistant-Doku zu Marken-Bildern
+beachten (Icon quadratisch, Logo mit kurzer Seite 128 bis 256 px, je zusätzlich `@2x`).
+
 ## Wenn das Original das Format grundlegend ändert
 
 Ändern sich Endpunkte oder die Struktur von `/properties/report` stark, zuerst `api.py` und

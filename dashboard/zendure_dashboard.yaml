@@ -1075,12 +1075,6 @@ views:
         offset: -1month
       cache: false
       apex_config:
-        annotations:
-          yaxis:
-          - y: 100
-            borderColor: var(--accent-color)
-            strokeDashArray: 4
-            borderWidth: 2
         yaxis:
         - decimalsInFloat: 0
           labels:
@@ -1132,6 +1126,23 @@ views:
         show:
           in_header: false
           extremas: false
+      - entity: sensor.zendure_relay_switches_charging_today
+        name: Limit
+        transform: return 100;
+        type: line
+        color: var(--accent-color)
+        stroke_width: 2
+        stroke_dash: 4
+        extend_to: end
+        float_precision: 0
+        show:
+          in_header: false
+          in_legend: false
+          extremas: false
+        statistics:
+          period: day
+          type: max
+          align: middle
     - type: heading
       icon: ''
       heading: Calibrations
@@ -1260,12 +1271,6 @@ views:
           size: 0
           hover:
             size: 0
-        annotations:
-          yaxis:
-          - y: 55
-            borderColor: var(--accent-color)
-            strokeDashArray: 4
-            borderWidth: 2
         yaxis:
         - decimalsInFloat: 0
           min: 0
@@ -1340,6 +1345,23 @@ views:
         show:
           in_header: false
           in_legend: false
+      - entity: sensor.zendure_inverter_temperature
+        name: Limit
+        transform: return 55;
+        type: line
+        color: var(--accent-color)
+        stroke_width: 2
+        stroke_dash: 4
+        extend_to: end
+        float_precision: 0
+        show:
+          in_header: false
+          in_legend: false
+          extremas: false
+        statistics:
+          period: 5minute
+          type: max
+          align: start
     - type: heading
       icon: ''
       heading: Batteries
@@ -1973,12 +1995,6 @@ views:
             size: 0
             hover:
               size: 0
-          annotations:
-            yaxis:
-            - y: 55
-              borderColor: var(--accent-color)
-              strokeDashArray: 4
-              borderWidth: 2
           yaxis:
           - decimalsInFloat: 0
             min: 0
@@ -2054,6 +2070,23 @@ views:
           show:
             in_header: false
             in_legend: false
+        - entity: sensor.zendure_inverter_temperature
+          name: Limit
+          transform: return 55;
+          type: line
+          color: var(--accent-color)
+          stroke_width: 2
+          stroke_dash: 4
+          extend_to: end
+          float_precision: 0
+          show:
+            in_header: false
+            in_legend: false
+            extremas: false
+          statistics:
+            period: 5minute
+            type: max
+            align: start
       grid_options:
         columns: 36
         rows: auto

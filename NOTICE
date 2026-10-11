@@ -20,7 +20,12 @@ Modifications made to the original
   and calibration tracking are computed inside the integration.
 - The Dynamic (price based) modes and the Node-RED proxy add-ons were not
   ported.
-- The dashboard was rewritten for the new entity IDs.
+- The dashboard was ported from the original for the new entity IDs. The
+  device images in dashboard/images/ are taken unchanged from the original
+  project (Devices/ folder) and are served locally by Home Assistant.
+- The integration icon and logo in custom_components/zendure_zensdk/brand/ are
+  derived from the original project's device image (V2_SF_3000_4000_Mix.png),
+  resized and placed on a transparent canvas.
 
 Use of this repository is restricted to personal, non-commercial purposes, as
 described in LICENSE.

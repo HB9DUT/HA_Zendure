@@ -77,19 +77,6 @@ this integration. Paste it into the raw configuration editor of a dashboard. The
 The integration writes power limits to your battery system. Test with *Manual* or
 *Quick Charge* at low power before enabling *Smart Matching*, and use it at your own risk.
 
-## Changes from the original
-
-As required by the original license, the modifications are stated here (details in [NOTICE](NOTICE)):
-
-- Reimplemented as a Python custom integration (config flow, one polling coordinator, native
-  entities) instead of a YAML package, helpers and automation.
-- Control logic ported for Standby, Manual, Smart Matching, Smart Charge Only, Smart Discharge Only,
-  Quick Charge and Quick Discharge. The Dynamic (price based) modes and the Node-RED proxy add-ons
-  were not ported.
-- Energy counters, efficiencies, RTE, relay switch counters and calibration tracking are computed
-  inside the integration. The grid meter is any configurable power sensor instead of a fixed HomeWizard P1.
-- The dashboard was rewritten for the new entity IDs.
-
 ## License
 
 The original work is licensed for personal, non-commercial use only; the original license

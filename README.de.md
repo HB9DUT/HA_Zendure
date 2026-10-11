@@ -87,6 +87,19 @@ Wird in der Integration berechnet und über Neustarts hinweg gespeichert: Energi
 Die Integration schreibt Leistungsgrenzen in Ihr Batteriesystem. Testen Sie zuerst mit niedriger Leistung
 im Modus *Manual* oder *Quick Charge*, bevor Sie *Smart Matching* aktivieren. Nutzung auf eigene Verantwortung.
 
+## Änderungen gegenüber dem Original
+
+Wie von der Original-Lizenz verlangt, sind die Änderungen hier benannt (Details im [NOTICE](NOTICE)):
+
+- Neu umgesetzt als Python-Custom-Integration (Config Flow, ein Poll-Coordinator, native Entities)
+  statt YAML-Package, Helfer und Automation.
+- Regellogik portiert für Standby, Manual, Smart Matching, Smart Charge Only, Smart Discharge Only,
+  Quick Charge und Quick Discharge. Die Dynamic-Modi (preisbasiert) und die Node-RED-Proxy-Erweiterungen
+  wurden nicht portiert.
+- Energiezähler, Wirkungsgrade, RTE, Relay-Switch-Zähler und Kalibrierung werden in der Integration
+  berechnet. Als Netzmesser dient ein frei wählbarer Leistungssensor statt eines fest verdrahteten HomeWizard P1.
+- Das Dashboard wurde für die neuen Entity-IDs neu geschrieben.
+
 ## Lizenz
 
 Das Original ist nur für den privaten, nicht-kommerziellen Gebrauch lizenziert. Die Original-Lizenz gilt

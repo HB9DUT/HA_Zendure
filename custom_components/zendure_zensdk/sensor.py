@@ -380,12 +380,14 @@ SENSORS: tuple[ZendureSensorDescription, ...] = (
         key="relay_switches_charging_today",
         name="Relay Switches Charging Today",
         icon="mdi:swap-vertical-bold",
+        state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda c: c.stats.relay_charging,
     ),
     ZendureSensorDescription(
         key="relay_switches_discharging_today",
         name="Relay Switches Discharging Today",
         icon="mdi:swap-vertical-bold",
+        state_class=SensorStateClass.MEASUREMENT,
         value_fn=lambda c: c.stats.relay_discharging,
     ),
     ZendureSensorDescription(

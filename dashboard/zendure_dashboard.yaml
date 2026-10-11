@@ -2265,36 +2265,5 @@ views:
         columns: 12
         rows: 12
       hours_to_show: 4
-    - type: heading
-      icon: ''
-      heading: Version
-      heading_style: title
-      badges:
-      - type: button
-        icon: mdi:information
-        text: Show Latest Release Notes
-        color: '#01a180'
-        tap_action:
-          action: navigate
-          navigation_path: releasenotes
-    - type: heading
-      icon: ''
-      heading: Version
-      heading_style: title
-      badges:
-      - type: button
-        icon: mdi:information
-        text: Show pre-releasenotes
-        color: '#01a180'
-        tap_action:
-          action: url
-          url_path: https://github.com/Gielz1986/Zendure-HA-zenSDK/pulls
-    - type: markdown
-      content: |
-        &nbsp;&nbsp;[![Open Issues](https://img.shields.io/github/issues/Gielz1986/Zendure-HA-zenSDK?style=for-the-badge&label=Open%20Issues&labelColor=029c7b&color=0d2e2b)](https://github.com/Gielz1986/Zendure-HA-zenSDK/issues)
-      grid_options:
-        columns: 12
-        rows: auto
-      text_only: true
   cards: []
   dense_section_placement: false

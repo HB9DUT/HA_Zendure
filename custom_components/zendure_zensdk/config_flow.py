@@ -22,7 +22,7 @@ from .const import (
 )
 
 GRID_SELECTOR = selector.EntitySelector(
-    selector.EntitySelectorConfig(domain="sensor", device_class="power")
+    selector.EntitySelectorConfig(domain=["sensor", "input_number"])
 )
 
 

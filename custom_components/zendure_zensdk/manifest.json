@@ -1,0 +1,14 @@
+{
+  "domain": "zendure_zensdk",
+  "name": "Zendure zenSDK",
+  "codeowners": [
+    "@HB9DUT"
+  ],
+  "config_flow": true,
+  "documentation": "https://github.com/HB9DUT/HA_Zendure",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/HB9DUT/HA_Zendure/issues",
+  "requirements": [],
+  "version": "0.1.0"
+}

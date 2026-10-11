@@ -1,0 +1,43 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Zendure-Gerät verbinden",
+        "description": "Gib die IP-Adresse des Zendure-Geräts ein (die lokale zenSDK-API muss verfügbar sein) und wähle den Sensor, der die Netzleistung in W meldet (positiv = Bezug, negativ = Einspeisung).",
+        "data": {
+          "host": "IP-Adresse",
+          "grid_entity": "Netzleistungs-Sensor"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Das Gerät ist nicht erreichbar. Prüfe die IP-Adresse und ob die lokale API (zenSDK) aktiv ist.",
+      "no_serial": "Das Gerät hat keine Seriennummer gemeldet."
+    },
+    "abort": {
+      "already_configured": "Dieses Gerät ist bereits eingerichtet.",
+      "cannot_connect": "Das Gerät ist nicht erreichbar.",
+      "no_serial": "Das Gerät hat keine Seriennummer gemeldet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Zendure-Optionen",
+        "data": {
+          "host": "IP-Adresse",
+          "grid_entity": "Netzleistungs-Sensor",
+          "scan_interval": "Abfrageintervall",
+          "battery_order": "Batterie-Reihenfolge"
+        },
+        "data_description": {
+          "battery_order": "Optional. Reihenfolge der Batteriepacks als Indizes mit Semikolon, z. B. 2;1;3. Leer lassen für die vom Gerät gemeldete Reihenfolge."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Das Gerät ist nicht erreichbar.",
+      "wrong_device": "Diese IP-Adresse gehört zu einem anderen Gerät."
+    }
+  }
+}

@@ -1,0 +1,291 @@
+# Zendure zenSDK dashboard
+#
+# Raw dashboard configuration: open a dashboard > three dots > "Raw configuration editor"
+# and paste this under `views:` (or replace the whole content for a new dashboard).
+#
+# - Requires the Apexcharts card from HACS for the chart (apexcharts-card).
+views:
+  - type: sections
+    max_columns: 3
+    title: Zendure
+    path: zendure
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Battery
+            heading_style: title
+            badges:
+              - type: entity
+                entity: sensor.zendure_power
+                show_state: true
+                show_icon: true
+                color: '#01a180'
+              - type: entity
+                entity: sensor.zendure_total_state_of_charge
+                show_state: true
+                show_icon: true
+                color: '#01a180'
+              - type: entity
+                entity: sensor.zendure_relay_switches_today
+                show_state: true
+                show_icon: true
+                icon: mdi:swap-vertical-bold
+                color: '#01a180'
+              - type: entity
+                entity: sensor.zendure_power_offgrid_outlet_1
+                show_state: true
+                show_icon: true
+                color: '#01a180'
+                visibility:
+                  - condition: state
+                    entity: sensor.zendure_offgrid_mode
+                    state_not: Turned Off
+                  - condition: numeric_state
+                    entity: sensor.zendure_power_offgrid_outlet_1
+                    above: 0
+          - type: entities
+            show_header_toggle: false
+            state_color: false
+            entities:
+              - entity: select.zendure_operation_mode
+                secondary_info: none
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: number.zendure_manual_power
+                name: Power (+ charge / - discharge)
+            visibility:
+              - condition: state
+                entity: select.zendure_operation_mode
+                state: Manual
+          - type: custom:apexcharts-card
+            graph_span: 1d
+            span:
+              start: day
+            cache: true
+            update_interval: 15min
+            header:
+              show: true
+              show_states: true
+              title: ''
+            series:
+              - entity: sensor.zendure_power
+                name: Battery
+                type: area
+                transform: return -x;
+                color: '#01a180'
+                opacity: 0.35
+                stroke_width: 2
+                extend_to: now
+                float_precision: 0
+                statistics:
+                  period: 5minute
+                  type: mean
+                  align: start
+                yaxis_id: power
+              - entity: sensor.zendure_home_energy_meter_target
+                name: Home Energy Meter
+                type: area
+                color: '#c0c0c2'
+                opacity: 0.3
+                stroke_width: 0
+                extend_to: now
+                float_precision: 0
+                statistics:
+                  period: 5minute
+                  type: mean
+                  align: start
+                yaxis_id: power
+              - entity: sensor.zendure_total_state_of_charge
+                name: State Of Charge
+                type: line
+                curve: smooth
+                color: var(--accent-color)
+                stroke_width: 2
+                extend_to: now
+                float_precision: 0
+                statistics:
+                  period: 5minute
+                  type: max
+                  align: start
+                yaxis_id: percentage
+                show:
+                  in_header: false
+            yaxis:
+              - id: power
+                decimals: 0
+              - id: percentage
+                opposite: true
+                min: 0
+                max: 100
+                decimals: 0
+            apex_config:
+              chart:
+                height: 300px
+              legend:
+                show: true
+      - type: grid
+        cards:
+          - type: heading
+            heading: Status
+            heading_style: title
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.zendure_charging_mode
+              - entity: sensor.zendure_set_charge_power
+              - entity: sensor.zendure_set_discharge_power
+              - entity: sensor.zendure_storage_mode
+              - entity: sensor.zendure_soc_limit_status
+              - entity: sensor.zendure_calibrating
+              - entity: sensor.zendure_error
+              - entity: sensor.zendure_last_action
+          - type: entities
+            show_header_toggle: false
+            title: Energy indication
+            entities:
+              - entity: sensor.zendure_total_capacity
+              - entity: sensor.zendure_indication_available_energy
+              - entity: sensor.zendure_indication_required_energy
+              - entity: sensor.zendure_indication_remaining_discharge_time
+              - entity: sensor.zendure_indication_remaining_charge_time
+          - type: entities
+            show_header_toggle: false
+            title: Efficiency and energy
+            entities:
+              - entity: sensor.zendure_rte_total
+              - entity: sensor.zendure_import_efficiency
+              - entity: sensor.zendure_export_efficiency
+              - entity: sensor.zendure_import_efficiency_24h
+              - entity: sensor.zendure_export_efficiency_24h
+              - entity: sensor.zendure_energy_import
+              - entity: sensor.zendure_energy_export
+              - entity: sensor.zendure_pv_import
+              - entity: sensor.zendure_pv_import_daily
+              - entity: sensor.zendure_home_energy_zero_import_duration_today
+          - type: entities
+            show_header_toggle: false
+            title: Relay and calibration
+            entities:
+              - entity: sensor.zendure_relay_switches_charging_today
+              - entity: sensor.zendure_relay_switches_discharging_today
+              - entity: sensor.zendure_relay_switches_today
+              - entity: sensor.zendure_last_calibration
+              - entity: sensor.zendure_last_calibration_days
+          - type: entities
+            show_header_toggle: false
+            title: PV
+            entities:
+              - entity: sensor.zendure_power_pv_total
+              - entity: sensor.zendure_power_pv_to_home
+              - entity: sensor.zendure_power_pv_to_battery
+              - entity: sensor.zendure_pv_passthrough
+              - entity: sensor.zendure_pv_export_mode
+      - type: grid
+        cards:
+          - type: heading
+            heading: Batteries
+            heading_style: title
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.zendure_total_batteries
+              - entity: sensor.zendure_inverter_temperature
+              - entity: sensor.zendure_battery_voltage
+              - entity: sensor.zendure_wifi_signal_strength
+          - type: entities
+            show_header_toggle: false
+            title: Battery 1
+            entities:
+              - entity: sensor.zendure_battery_1_state_of_charge
+              - entity: sensor.zendure_battery_1_temperature
+              - entity: sensor.zendure_battery_1_cell_balance_status
+          - type: entities
+            show_header_toggle: false
+            title: Battery 2
+            entities:
+              - entity: sensor.zendure_battery_2_state_of_charge
+              - entity: sensor.zendure_battery_2_temperature
+              - entity: sensor.zendure_battery_2_cell_balance_status
+            visibility:
+              - condition: numeric_state
+                entity: sensor.zendure_total_batteries
+                above: 1
+          - type: entities
+            show_header_toggle: false
+            title: Battery 3
+            entities:
+              - entity: sensor.zendure_battery_3_state_of_charge
+              - entity: sensor.zendure_battery_3_temperature
+              - entity: sensor.zendure_battery_3_cell_balance_status
+            visibility:
+              - condition: numeric_state
+                entity: sensor.zendure_total_batteries
+                above: 2
+          - type: entities
+            show_header_toggle: false
+            title: Battery 4
+            entities:
+              - entity: sensor.zendure_battery_4_state_of_charge
+              - entity: sensor.zendure_battery_4_temperature
+              - entity: sensor.zendure_battery_4_cell_balance_status
+            visibility:
+              - condition: numeric_state
+                entity: sensor.zendure_total_batteries
+                above: 3
+          - type: entities
+            show_header_toggle: false
+            title: Battery 5
+            entities:
+              - entity: sensor.zendure_battery_5_state_of_charge
+              - entity: sensor.zendure_battery_5_temperature
+              - entity: sensor.zendure_battery_5_cell_balance_status
+            visibility:
+              - condition: numeric_state
+                entity: sensor.zendure_total_batteries
+                above: 4
+          - type: entities
+            show_header_toggle: false
+            title: Battery 6
+            entities:
+              - entity: sensor.zendure_battery_6_state_of_charge
+              - entity: sensor.zendure_battery_6_temperature
+              - entity: sensor.zendure_battery_6_cell_balance_status
+            visibility:
+              - condition: numeric_state
+                entity: sensor.zendure_total_batteries
+                above: 5
+  - type: sections
+    max_columns: 2
+    title: Settings
+    path: zendure-settings
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Power and SoC limits
+            heading_style: title
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: number.zendure_maximum_charge_power
+              - entity: number.zendure_maximum_discharge_power
+              - entity: number.zendure_minimum_allowed_state_of_charge
+              - entity: number.zendure_maximum_allowed_state_of_charge
+              - entity: switch.zendure_soc_protection_disabled
+              - entity: switch.zendure_pv_export_disabled
+      - type: grid
+        cards:
+          - type: heading
+            heading: Smart matching
+            heading_style: title
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: number.zendure_start_discharging_at
+              - entity: number.zendure_start_charging_at
+              - entity: number.zendure_discharge_buffer
+              - entity: number.zendure_charge_buffer
+              - entity: number.zendure_standby_delay
+              - entity: button.zendure_set_default_settings

@@ -1,0 +1,26 @@
+Zendure zenSDK for Home Assistant
+=================================
+
+Based on an idea by Gielz1986 (Michiel Hofker):
+https://github.com/Gielz1986/Zendure-HA-zenSDK
+
+This repository is a derivative work of "Zendure Home Assistant -
+Zendure-HA-zenSDK (Gielz)" (global / English version). The original license is
+included unchanged in the file LICENSE and applies to this repository as well.
+
+Modifications made to the original
+----------------------------------
+- The YAML package, automation and helpers were reimplemented as a Home
+  Assistant custom integration written in Python (config flow, one polling
+  coordinator, native entities).
+- The control logic of the automation was ported to Python for the modes
+  Standby, Manual, Smart Matching, Smart Charge Only, Smart Discharge Only,
+  Quick Charge and Quick Discharge.
+- Energy counters, efficiencies, round-trip efficiency, relay switch counters
+  and calibration tracking are computed inside the integration.
+- The Dynamic (price based) modes and the Node-RED proxy add-ons were not
+  ported.
+- The dashboard was rewritten for the new entity IDs.
+
+Use of this repository is restricted to personal, non-commercial purposes, as
+described in LICENSE.

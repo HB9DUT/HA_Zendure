@@ -1,0 +1,43 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect Zendure device",
+        "description": "Enter the IP address of the Zendure device (zenSDK local API must be available) and select the sensor that reports your net grid power in W (positive = import, negative = export).",
+        "data": {
+          "host": "IP address",
+          "grid_entity": "Grid power sensor"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the device. Check the IP address and that the local API (zenSDK) is enabled.",
+      "no_serial": "The device did not report a serial number."
+    },
+    "abort": {
+      "already_configured": "This device is already configured.",
+      "cannot_connect": "Could not reach the device.",
+      "no_serial": "The device did not report a serial number."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Zendure options",
+        "data": {
+          "host": "IP address",
+          "grid_entity": "Grid power sensor",
+          "scan_interval": "Polling interval",
+          "battery_order": "Battery order"
+        },
+        "data_description": {
+          "battery_order": "Optional. Order of the battery packs as semicolon separated indexes, for example 2;1;3. Leave empty for the order reported by the device."
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not reach the device.",
+      "wrong_device": "This IP address belongs to a different device."
+    }
+  }
+}

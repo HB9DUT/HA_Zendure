@@ -5,10 +5,13 @@
     "@HB9DUT"
   ],
   "config_flow": true,
+  "dependencies": [
+    "http"
+  ],
   "documentation": "https://github.com/HB9DUT/HA_Zendure",
   "integration_type": "device",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/HB9DUT/HA_Zendure/issues",
   "requirements": [],
-  "version": "1.0.2"
+  "version": "1.0.3"
 }

@@ -3,9 +3,7 @@
 # Raw dashboard configuration: dashboard > three dots > "Raw configuration editor" and paste.
 # Requires the apexcharts-card from HACS.
 #
-# Device image: copy the files from dashboard/images/ of this repository to
-# <home assistant config>/www/zendure/ (they are then served as /local/zendure/...).
-# If the www folder did not exist before, restart Home Assistant once.
+# The device images are served by the integration itself (/zendure_zensdk/...).
 views:
 - type: sections
   max_columns: 3
@@ -2077,7 +2075,7 @@ views:
       text_only: true
       content: |-
         {% set product = states('sensor.zendure_product_model') %} {% set last = states.sensor.zendure_power.last_reported %}
-        {% set base = '/local/zendure/' %}
+        {% set base = '/zendure_zensdk/' %}
         {% set images = {
           'solarFlow2400AC': 'V2_SF_2400_AC.png',
           'solarFlow2400AC+': 'V2_SF_2400_AC_Plus_Pro.png',

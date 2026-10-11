@@ -3,18 +3,27 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
+from homeassistant.components.http import StaticPathConfig
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
+from homeassistant.helpers.typing import ConfigType
 
 from .api import ZendureApi
-from .const import CONF_HOST
+from .const import CONF_HOST, DOMAIN
 from .controller import ZendureController
 from .coordinator import ZendureCoordinator
 
 PLATFORMS = ["sensor", "number", "select", "switch", "button"]
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+# Device images used by the dashboard are served from /zendure_zensdk/<file>
+IMAGES_URL = f"/{DOMAIN}"
 
 
 @dataclass
@@ -26,6 +35,14 @@ class ZendureData:
 
 
 type ZendureConfigEntry = ConfigEntry[ZendureData]
+
+
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
+    """Serve the bundled device images (once per Home Assistant start)."""
+    await hass.http.async_register_static_paths(
+        [StaticPathConfig(IMAGES_URL, str(Path(__file__).parent / "images"), True)]
+    )
+    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ZendureConfigEntry) -> bool:

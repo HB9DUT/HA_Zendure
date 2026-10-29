@@ -184,6 +184,12 @@ sondern bei einer Änderung des Originals bewusst entscheiden.
   anderen Einstellungen sind die empfohlenen Defaults (`RECOMMENDED_DEFAULTS`). Die Werte liegen im
   Speicher der Integration (`.storage`), nicht in Helfern.
 - Abfrageintervall 2 s (einstellbar), Original 1 s. Die Regelung läuft wie im Original alle 5 s.
+- Eigene Funktion **Discharge Lock Until Full** (`switch.zendure_discharge_lock_until_full`, gibt es im
+  Original nicht): Solange der Schalter an ist, wird in den Smart-Modi nicht entladen; eine laufende
+  Entladung wird gestoppt (`outputLimit` 0). Laden läuft normal. Der Schalter ist unabhängig vom Modus,
+  damit Automationen (z. B. Heizung/BEV: Smart Charge Only und zurück) ihn nicht aufheben. Er geht von selbst
+  aus, sobald der Akku voll ist (SoC 100 % oder „Charging Limit Reached“) und keine Kalibrierung läuft.
+  Manual und Quick Discharge sind bewusst nicht gesperrt.
 
 **Sensoren und Statistik (`coordinator.py`, `sensor.py`, `stats.py`)**
 - Der 24h-Wirkungsgrad ist ein arithmetischer Mittelwert über Stichproben bei jeder Wertänderung (wie
@@ -203,6 +209,7 @@ sondern bei einer Änderung des Originals bewusst entscheiden.
   weil die Marken in den Karten bei 0 statt am Wert standen.
 - Der Heartbeat der Geräte-Karte nutzt `last_reported` von `sensor.zendure_power`.
 - Die Gerätebilder liefert die Integration selbst unter `/zendure_zensdk/`.
+- Der Schalter `Discharge Lock Until Full` wird nach `SOC Protection Disabled` eingefügt (`extra_entities`).
 
 ## Entwicklungsumgebung
 

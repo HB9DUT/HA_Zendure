@@ -239,6 +239,20 @@ def limit_lines(node):
     return node
 
 
+def extra_entities(node):
+    """Add entities of this integration that the original does not have."""
+    if isinstance(node, list):
+        out = []
+        for x in node:
+            out.append(extra_entities(x))
+            if isinstance(x, dict) and x.get("entity") == "switch.zendure_soc_protection_disabled":
+                out.append({"entity": "switch.zendure_discharge_lock_until_full", "name": "Discharge Lock Until Full"})
+        return out
+    if isinstance(node, dict):
+        return {k: extra_entities(v) for k, v in node.items()}
+    return node
+
+
 def _str_repr(dumper, value):
     nl = chr(10)
     if nl in value:
@@ -249,7 +263,7 @@ def _str_repr(dumper, value):
 
 yaml.add_representer(str, _str_repr)
 data = yaml.safe_load(open(src, encoding="utf-8"))
-data = limit_lines(remap(pv_fix(data)))
+data = extra_entities(limit_lines(remap(pv_fix(data))))
 
 views = []
 for view in data["views"]:

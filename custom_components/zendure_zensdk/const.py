@@ -57,6 +57,7 @@ SETTING_STANDBY_DELAY = "standby_delay"
 SETTING_MANUAL_POWER = "manual_power"
 SETTING_SOC_PROTECTION_DISABLED = "soc_protection_disabled"
 SETTING_PV_EXPORT_DISABLED = "pv_export_disabled"
+SETTING_DISCHARGE_LOCK = "discharge_lock"
 SETTING_MODE = "mode"
 
 # Recommended defaults (same as the upstream "set default settings" button)

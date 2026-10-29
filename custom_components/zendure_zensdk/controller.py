@@ -36,6 +36,7 @@ from .const import (
     RECOMMENDED_DEFAULTS,
     SETTING_CHARGE_BUFFER,
     SETTING_DISCHARGE_BUFFER,
+    SETTING_DISCHARGE_LOCK,
     SETTING_MANUAL_POWER,
     SETTING_MAX_CHARGE_POWER,
     SETTING_MAX_DISCHARGE_POWER,
@@ -137,6 +138,7 @@ class ZendureController:
             SETTING_MODE: MODE_STANDBY,
             SETTING_MANUAL_POWER: 0,
             SETTING_SOC_PROTECTION_DISABLED: False,
+            SETTING_DISCHARGE_LOCK: False,
             SETTING_PV_EXPORT_DISABLED: int(_f(p.get("gridReverse"))) == 2,
             **RECOMMENDED_DEFAULTS,
             **device,
@@ -266,6 +268,7 @@ class ZendureController:
             meter_down = self._held("meter_down", meter is None, 60)
             await self._system(meter, meter_down)
             await self._sync_device_settings()
+            await self._release_discharge_lock()
             await self._smart(meter)
             await self._manual()
         except Exception:  # noqa: BLE001 - never let the loop die
@@ -388,6 +391,17 @@ class ZendureController:
         if wanted:
             await self._write(wanted, f"Device settings updated: {wanted}")
 
+    async def _release_discharge_lock(self) -> None:
+        """Lift the discharge lock once the battery has been charged full."""
+        c = self.coordinator
+        if not self.get(SETTING_DISCHARGE_LOCK):
+            return
+        full = c.soc >= 100 or c.soc_limit_status == "Charging Limit Reached"
+        calibrating = int(_f(c.props.get("socStatus"))) == 1
+        if full and not calibrating:
+            await self.async_set(SETTING_DISCHARGE_LOCK, False)
+            self._log("Battery full, discharge lock released")
+
     async def _smart(self, meter: float | None) -> None:
         """Smart Matching control; first matching rule wins."""
         mode = self.get(SETTING_MODE)
@@ -404,6 +418,7 @@ class ZendureController:
         set_discharge = int(_f(p.get("outputLimit")))
         near_zero = -30 < power < 30
         prot_off = self.get(SETTING_SOC_PROTECTION_DISABLED)
+        locked = self.get(SETTING_DISCHARGE_LOCK)
 
         def discharge_target(factor: float) -> int:
             cap = float(self.get(SETTING_MAX_DISCHARGE_POWER))
@@ -416,7 +431,10 @@ class ZendureController:
             return int(_clamp(diff, 0, cap))
 
         can_discharge = (
-            mode in DISCHARGE_MODES and status in OK_FOR_DISCHARGE and soc > min_soc
+            mode in DISCHARGE_MODES
+            and status in OK_FOR_DISCHARGE
+            and soc > min_soc
+            and not locked
         )
         can_charge = (
             mode in CHARGE_MODES
@@ -424,6 +442,13 @@ class ZendureController:
             and soc < max_soc
             and (round(soc) >= round(min_soc) or prot_off)
         )
+
+        # Discharge lock: stop a running discharge
+        if locked and set_discharge != 0:
+            await self._write(
+                {"outputLimit": 0}, "Discharge lock active, discharging stopped"
+            )
+            return
 
         # Start discharging (75 % of demand)
         charging_settled = not (

@@ -11,7 +11,7 @@ Dokument beschreibt, wie wir prüfen, was davon relevant ist, und wie wir es üb
 |---|---|
 | Original-Tag | `v20261007` |
 | Original-Commit | `75f7f2f759f66d6d7be452247b0bcfa4736675c7` (2026-10-07) |
-| Unsere Version zu diesem Stand | `1.0.4` |
+| Unsere Version zu diesem Stand | `1.1.0` |
 | Zuletzt geprüft | 2026-10-29: keine Änderungen am Code des Originals seit `v20261007` (siehe „Offene Punkte im Original“) |
 
 **Nach jedem Abgleich diese Tabelle aktualisieren**, auch wenn nichts übernommen wurde (dann

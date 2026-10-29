@@ -75,6 +75,10 @@ Standby nach Inaktivität, SoC-Schutz (Laden bis zum Minimum-SoC), Notabschaltun
 Netzmesser nach einer Minute, AC-Passthrough für den Off-Grid-Ausgang und der Abgleich von
 Min/Max-SoC, max. Lade-/Entladeleistung und PV-Export mit dem Gerät.
 
+Nicht im Original: Der Schalter `Discharge Lock Until Full` sperrt das Entladen in den Smart-Modi, bis
+der Akku einmal voll geladen ist (z. B. zur Kalibrierung), und schaltet sich danach selbst aus. Er ist
+unabhängig vom Betriebsmodus, Automationen, die den Modus wechseln, heben ihn also nicht auf.
+
 ## Statistik
 
 Wird in der Integration berechnet und über Neustarts hinweg gespeichert: Energiezähler (`Energy Import`,

@@ -12,7 +12,7 @@ Dokument beschreibt, wie wir prüfen, was davon relevant ist, und wie wir es üb
 | Original-Tag | `v20261007` |
 | Original-Commit | `75f7f2f759f66d6d7be452247b0bcfa4736675c7` (2026-10-07) |
 | Unsere Version zu diesem Stand | `1.0.4` |
-| Zuletzt geprüft | 2026-10-13: keine Änderungen am Code des Originals seit `v20261007` (siehe „Offene Punkte im Original“) |
+| Zuletzt geprüft | 2026-10-29: keine Änderungen am Code des Originals seit `v20261007` (siehe „Offene Punkte im Original“) |
 
 **Nach jedem Abgleich diese Tabelle aktualisieren**, auch wenn nichts übernommen wurde (dann
 steht dort der geprüfte Tag). Die Versionen des Originals sind Daten wie `v20261007`.
@@ -144,17 +144,18 @@ erhalten bleiben.
 ## Offene Punkte im Original (beobachten)
 
 Auch ohne neuen Tag lohnt ein Blick auf die offenen Issues des Originals, denn sie betreffen Logik, die
-wir übernommen haben. Stand 2026-10-13, keiner davon ist im Original behoben:
+wir übernommen haben. Stand 2026-10-29, keiner davon ist im Original behoben:
 
 | Issue | Inhalt | Betrifft uns? |
 |---|---|---|
 | #317 | SoC-Schutz stoppt das Laden nicht: Der Stopp-Pfad (Leistung auf 0 W, wenn der Ladestand das Minimum erreicht) hängt hinter der Bedingung „Tageslicht oder Einspeisung“ und prüft exakte Gleichheit des Ladestands. Fällt die Bedingung während des Ladens weg, wird das Minimum übersprungen und das Gerät lädt mit 1200 W weiter, auch im Standby. | Ja, `controller.py` `_system` hat dieselbe Struktur. Eigener Fix offen. |
 | #275 | Der AC-Port bleibt nach einem kurzen Ladebefehl auf Laden (`acMode=1`) hängen, Smart Matching versorgt das Haus dann nicht mehr. Die Entladung wird nur gesendet, wenn sich die Leistung ändert, nicht wenn die Richtung falsch ist. | Möglich. Beim Entladen-Ausgleich schreiben wir nur `outputLimit`. Gerät-seitig, noch unbestätigt. |
 | #183 | `sensor.zendure_power` zeigt bei PV-Betrieb teils die falsche Richtung (Ableitung aus `pass`). | Gleiche Formel in `coordinator.py` (`power`). Betrifft Anlagen mit PV. |
-| #316 | Hohe Batterie-Entladung im Standby mit laufender Automation. Der Maintainer verweist auf die automatische Standby-Verzögerung. | Konfiguration (`Standby Delay`), kein Codefehler. |
+| #328 | Smart Matching bei SoC genau = Min-SoC: Der Entladen-Ausgleich verlangt SoC > Min, die Entladeleistung bleibt deshalb auf dem letzten Wert stehen. „Laden starten“ verlangt eine ruhende Batterie, also wird bei PV-Überschuss minutenlang weiter entladen und eingespeist, bis das BMS stoppt. Vorschlag im Issue: bei SoC <= Min nur noch herunterregeln bzw. `outputLimit` 0, wenn Einspeisung unter „Start Charging At“. Gemeldet auf einem SF 4000 Mix AC+. | Ja, `_smart` hat dieselben Bedingungen (`can_discharge` mit `soc > min_soc`). Eigener Fix offen. |
+| #331 | Off-Grid: Die Leistung der Off-Grid-Steckdose zählt als Entladung ins Haus (Ableitung aus `packInputPower`), das Haus wird überversorgt und es wird eingespeist; im Leerlauf bleibt die Leistung negativ, Laden startet nie. Die AC-Durchleitungsregel greift nur bei exakter Gleichheit. Vorschlag: `gridOffPower` von `packInputPower` abziehen. | Ja, gleiche Formel in `coordinator.py` (`power`) und gleiche Regel in `_system`. Nur bei Nutzung der Off-Grid-Steckdose. |
 
 Nicht relevant: #313 (Probleme mit YAML-Helfern unter Home Assistant 2026.10, bei einer Integration nicht
-vorhanden), die offenen Pull Requests (#277, #263, #244 betreffen Dynamic-Modi und Hilfs-Zähler, die wir nicht haben).
+vorhanden), #316 (geschlossen, Konfiguration der Standby-Verzögerung), die offenen Pull Requests (#277, #263, #244 betreffen Dynamic-Modi und Hilfs-Zähler, die wir nicht haben).
 
 ## Bewusste Abweichungen vom Original
 

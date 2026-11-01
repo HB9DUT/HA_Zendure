@@ -11,7 +11,7 @@ Dokument beschreibt, wie wir prüfen, was davon relevant ist, und wie wir es üb
 |---|---|
 | Original-Tag | `v20261007` |
 | Original-Commit | `75f7f2f759f66d6d7be452247b0bcfa4736675c7` (2026-10-07) |
-| Unsere Version zu diesem Stand | `1.1.0` |
+| Unsere Version zu diesem Stand | `1.2.0` |
 | Zuletzt geprüft | 2026-10-29: keine Änderungen am Code des Originals seit `v20261007` (siehe „Offene Punkte im Original“) |
 
 **Nach jedem Abgleich diese Tabelle aktualisieren**, auch wenn nichts übernommen wurde (dann
@@ -188,9 +188,13 @@ sondern bei einer Änderung des Originals bewusst entscheiden.
 - Eigene Funktion **Discharge Lock Until Full** (`switch.zendure_discharge_lock_until_full`, gibt es im
   Original nicht): Solange der Schalter an ist, wird in den Smart-Modi nicht entladen; eine laufende
   Entladung wird gestoppt (`outputLimit` 0). Laden läuft normal. Der Schalter ist unabhängig vom Modus,
-  damit Automationen (z. B. Heizung/BEV: Smart Charge Only und zurück) ihn nicht aufheben. Er geht von selbst
-  aus, sobald der Akku voll ist (SoC 100 % oder „Charging Limit Reached“) und keine Kalibrierung läuft.
-  Manual und Quick Discharge sind bewusst nicht gesperrt.
+  damit Automationen (z. B. Heizung/BEV: Smart Charge Only und zurück) ihn nicht aufheben. Ist der Schalter
+  **Full Cycle Automatic** (`switch.zendure_full_cycle_automatic`, Standard an) an, geht die Sperre von selbst
+  an, sobald der SoC den Min-SoC des Geräts (`minSoc`) erreicht. Sie geht immer von selbst aus, sobald der SoC den
+  Max-SoC (`socSet`) erreicht oder „Charging Limit Reached“ meldet und keine Kalibrierung läuft (voller Hub
+  vor dem nächsten Entladen). Das Einschalten ist flankengesteuert (`_lock_armed`): Wer ihn beim Min-SoC
+  von Hand ausschaltet, behält das, bis der SoC wieder über dem Minimum war. Nach einem Neustart ist er
+  „scharf“; steht der SoC dann am Minimum, geht er an. Manual und Quick Discharge sind bewusst nicht gesperrt.
 
 **Sensoren und Statistik (`coordinator.py`, `sensor.py`, `stats.py`)**
 - Der 24h-Wirkungsgrad ist ein arithmetischer Mittelwert über Stichproben bei jeder Wertänderung (wie
@@ -210,7 +214,8 @@ sondern bei einer Änderung des Originals bewusst entscheiden.
   weil die Marken in den Karten bei 0 statt am Wert standen.
 - Der Heartbeat der Geräte-Karte nutzt `last_reported` von `sensor.zendure_power`.
 - Die Gerätebilder liefert die Integration selbst unter `/zendure_zensdk/`.
-- Der Schalter `Discharge Lock Until Full` wird nach `SOC Protection Disabled` eingefügt (`extra_entities`).
+- Die Schalter `Discharge Lock Until Full` und `Full Cycle Automatic` werden nach `SOC Protection Disabled`
+  eingefügt (`extra_entities`).
 
 ## Entwicklungsumgebung
 

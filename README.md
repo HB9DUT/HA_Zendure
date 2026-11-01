@@ -47,9 +47,12 @@ standby after inactivity, SoC protection (charge to minimum SoC), emergency shut
 the grid meter is lost for a minute, AC passthrough for the off-grid outlet, and syncing of
 min/max SoC, max charge/discharge power and PV export to the device.
 
-Not in the original: the switch `Discharge Lock Until Full` blocks discharging in the smart modes until
-the battery has been charged full once (e.g. for calibration); it then turns itself off. It is
-independent of the operation mode, so automations that switch modes do not lift it.
+Not in the original: the switch `Discharge Lock Until Full` blocks discharging in the smart modes. It
+turns itself off when the battery reaches the maximum allowed SoC. With the switch `Full Cycle Automatic`
+(on by default) it also turns itself on when the battery reaches the minimum allowed SoC, so the battery
+always runs a full cycle before it discharges again. The lock can also be switched by hand (e.g. on for
+calibration); switched off by hand at the minimum SoC, it stays off until the SoC has risen above the
+minimum. It is independent of the operation mode, so automations that switch modes do not lift it.
 
 ## Statistics
 

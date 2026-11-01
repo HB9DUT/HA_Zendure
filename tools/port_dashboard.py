@@ -247,6 +247,7 @@ def extra_entities(node):
             out.append(extra_entities(x))
             if isinstance(x, dict) and x.get("entity") == "switch.zendure_soc_protection_disabled":
                 out.append({"entity": "switch.zendure_discharge_lock_until_full", "name": "Discharge Lock Until Full"})
+                out.append({"entity": "switch.zendure_full_cycle_automatic", "name": "Full Cycle Automatic"})
         return out
     if isinstance(node, dict):
         return {k: extra_entities(v) for k, v in node.items()}

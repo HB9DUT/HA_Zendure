@@ -37,6 +37,7 @@ from .const import (
     SETTING_CHARGE_BUFFER,
     SETTING_DISCHARGE_BUFFER,
     SETTING_DISCHARGE_LOCK,
+    SETTING_FULL_CYCLE_AUTO,
     SETTING_MANUAL_POWER,
     SETTING_MAX_CHARGE_POWER,
     SETTING_MAX_DISCHARGE_POWER,
@@ -104,6 +105,7 @@ class ZendureController:
         self._since: dict[str, float] = {}
         self._last_charging_mode: str | None = None
         self._charging_mode_since = time.monotonic()
+        self._lock_armed = True
         self._ready = False
 
     # -- lifecycle -----------------------------------------------------------
@@ -139,6 +141,7 @@ class ZendureController:
             SETTING_MANUAL_POWER: 0,
             SETTING_SOC_PROTECTION_DISABLED: False,
             SETTING_DISCHARGE_LOCK: False,
+            SETTING_FULL_CYCLE_AUTO: True,
             SETTING_PV_EXPORT_DISABLED: int(_f(p.get("gridReverse"))) == 2,
             **RECOMMENDED_DEFAULTS,
             **device,
@@ -268,7 +271,7 @@ class ZendureController:
             meter_down = self._held("meter_down", meter is None, 60)
             await self._system(meter, meter_down)
             await self._sync_device_settings()
-            await self._release_discharge_lock()
+            await self._discharge_lock()
             await self._smart(meter)
             await self._manual()
         except Exception:  # noqa: BLE001 - never let the loop die
@@ -391,16 +394,34 @@ class ZendureController:
         if wanted:
             await self._write(wanted, f"Device settings updated: {wanted}")
 
-    async def _release_discharge_lock(self) -> None:
-        """Lift the discharge lock once the battery has been charged full."""
+    async def _discharge_lock(self) -> None:
+        """Set the discharge lock at min SoC (if the full cycle automatic is on),
+        lift it again at max SoC.
+
+        Setting it is edge triggered: once the lock has been set (or the SoC
+        is still at the minimum), it is only set again after the SoC has risen
+        above the minimum, so switching it off by hand at min SoC sticks.
+        """
         c = self.coordinator
+        soc = c.soc
+        min_soc = c.device_min_soc
+        max_soc = c.device_max_soc or 100.0
+        if soc > min_soc:
+            self._lock_armed = True
         if not self.get(SETTING_DISCHARGE_LOCK):
+            auto = self.get(SETTING_FULL_CYCLE_AUTO)
+            if auto and self._lock_armed and soc <= min_soc:
+                self._lock_armed = False
+                await self.async_set(SETTING_DISCHARGE_LOCK, True)
+                self._log(f"Minimum SoC {int(min_soc)} % reached, discharge lock set")
             return
-        full = c.soc >= 100 or c.soc_limit_status == "Charging Limit Reached"
+        if soc <= min_soc:
+            self._lock_armed = False
+        full = soc >= max_soc or c.soc_limit_status == "Charging Limit Reached"
         calibrating = int(_f(c.props.get("socStatus"))) == 1
         if full and not calibrating:
             await self.async_set(SETTING_DISCHARGE_LOCK, False)
-            self._log("Battery full, discharge lock released")
+            self._log(f"Maximum SoC {int(max_soc)} % reached, discharge lock released")
 
     async def _smart(self, meter: float | None) -> None:
         """Smart Matching control; first matching rule wins."""

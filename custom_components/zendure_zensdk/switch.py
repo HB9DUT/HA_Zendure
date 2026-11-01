@@ -11,6 +11,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import ZendureConfigEntry
 from .const import (
     SETTING_DISCHARGE_LOCK,
+    SETTING_FULL_CYCLE_AUTO,
     SETTING_PV_EXPORT_DISABLED,
     SETTING_SOC_PROTECTION_DISABLED,
 )
@@ -20,6 +21,7 @@ SWITCHES = {
     SETTING_SOC_PROTECTION_DISABLED: ("SOC Protection Disabled", "mdi:battery-heart-variant"),
     SETTING_PV_EXPORT_DISABLED: ("PV Export Disabled", "mdi:solar-panel"),
     SETTING_DISCHARGE_LOCK: ("Discharge Lock Until Full", "mdi:battery-lock"),
+    SETTING_FULL_CYCLE_AUTO: ("Full Cycle Automatic", "mdi:battery-sync"),
 }
 
 

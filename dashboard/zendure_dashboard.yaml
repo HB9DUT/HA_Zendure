@@ -2276,6 +2276,8 @@ views:
         name: SOC Protection Disabled
       - entity: switch.zendure_discharge_lock_until_full
         name: Discharge Lock Until Full
+      - entity: switch.zendure_full_cycle_automatic
+        name: Full Cycle Automatic
       - entity: number.zendure_minimum_allowed_state_of_charge
         name: Min. State Of Charge
       - entity: number.zendure_maximum_allowed_state_of_charge

@@ -12,7 +12,7 @@ Dokument beschreibt, wie wir prüfen, was davon relevant ist, und wie wir es üb
 | Original-Tag | `v20261007` |
 | Original-Commit | `75f7f2f759f66d6d7be452247b0bcfa4736675c7` (2026-10-07) |
 | Unsere Version zu diesem Stand | `1.2.0` |
-| Zuletzt geprüft | 2026-10-29: keine Änderungen am Code des Originals seit `v20261007` (siehe „Offene Punkte im Original“) |
+| Zuletzt geprüft | 2026-11-04: keine Änderungen am Code des Originals seit `v20261007` (siehe „Offene Punkte im Original“) |
 
 **Nach jedem Abgleich diese Tabelle aktualisieren**, auch wenn nichts übernommen wurde (dann
 steht dort der geprüfte Tag). Die Versionen des Originals sind Daten wie `v20261007`.
@@ -144,7 +144,7 @@ erhalten bleiben.
 ## Offene Punkte im Original (beobachten)
 
 Auch ohne neuen Tag lohnt ein Blick auf die offenen Issues des Originals, denn sie betreffen Logik, die
-wir übernommen haben. Stand 2026-10-29, keiner davon ist im Original behoben:
+wir übernommen haben. Stand 2026-11-04, keiner davon ist im Original behoben:
 
 | Issue | Inhalt | Betrifft uns? |
 |---|---|---|
@@ -155,7 +155,10 @@ wir übernommen haben. Stand 2026-10-29, keiner davon ist im Original behoben:
 | #331 | Off-Grid: Die Leistung der Off-Grid-Steckdose zählt als Entladung ins Haus (Ableitung aus `packInputPower`), das Haus wird überversorgt und es wird eingespeist; im Leerlauf bleibt die Leistung negativ, Laden startet nie. Die AC-Durchleitungsregel greift nur bei exakter Gleichheit. Vorschlag: `gridOffPower` von `packInputPower` abziehen. | Ja, gleiche Formel in `coordinator.py` (`power`) und gleiche Regel in `_system`. Nur bei Nutzung der Off-Grid-Steckdose. |
 
 Nicht relevant: #313 (Probleme mit YAML-Helfern unter Home Assistant 2026.10, bei einer Integration nicht
-vorhanden), #316 (geschlossen, Konfiguration der Standby-Verzögerung), die offenen Pull Requests (#277, #263, #244 betreffen Dynamic-Modi und Hilfs-Zähler, die wir nicht haben).
+vorhanden), #316 (geschlossen, Konfiguration der Standby-Verzögerung), #339 (Template-Fehler mit
+`unavailable` in der YAML-Automation; bei uns liefert `_f` einen Standardwert), #340 (Frage zur Steuerung der
+Off-Grid-Steckdose, kein Fehler), #265 (geschlossen, Ladeleistung durch BMS/Gerät begrenzt, Gerät wurde
+getauscht), die offenen Pull Requests (#277, #263, #244 betreffen Dynamic-Modi und Hilfs-Zähler, die wir nicht haben).
 
 ## Bewusste Abweichungen vom Original
 

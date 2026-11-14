@@ -9,10 +9,10 @@ Dokument beschreibt, wie wir prüfen, was davon relevant ist, und wie wir es üb
 
 | | |
 |---|---|
-| Original-Tag | `v20261007` |
-| Original-Commit | `75f7f2f759f66d6d7be452247b0bcfa4736675c7` (2026-10-07) |
-| Unsere Version zu diesem Stand | `1.2.0` |
-| Zuletzt geprüft | 2026-11-04: keine Änderungen am Code des Originals seit `v20261007` (siehe „Offene Punkte im Original“) |
+| Original-Tag | `v20261113` |
+| Original-Commit | `d070d60d4f93d6a18157ea2cb259aa72bcb69c0d` (2026-11-13) |
+| Unsere Version zu diesem Stand | `1.4.0` |
+| Zuletzt geprüft | 2026-11-14: `v20261113` übernommen (Kapazitäten der Mix-Geräte, #341). Sonst nur Anführungszeichen in der Automation und `pvStatus` mit Standardwert (#344, bei uns schon durch `_f` abgedeckt). |
 
 **Nach jedem Abgleich diese Tabelle aktualisieren**, auch wenn nichts übernommen wurde (dann
 steht dort der geprüfte Tag). Die Versionen des Originals sind Daten wie `v20261007`.
@@ -144,11 +144,11 @@ erhalten bleiben.
 ## Offene Punkte im Original (beobachten)
 
 Auch ohne neuen Tag lohnt ein Blick auf die offenen Issues des Originals, denn sie betreffen Logik, die
-wir übernommen haben. Stand 2026-11-04, keiner davon ist im Original behoben:
+wir übernommen haben. Stand 2026-11-14, keiner davon ist im Original behoben:
 
 | Issue | Inhalt | Betrifft uns? |
 |---|---|---|
-| #317 | SoC-Schutz stoppt das Laden nicht: Der Stopp-Pfad (Leistung auf 0 W, wenn der Ladestand das Minimum erreicht) hängt hinter der Bedingung „Tageslicht oder Einspeisung“ und prüft exakte Gleichheit des Ladestands. Fällt die Bedingung während des Ladens weg, wird das Minimum übersprungen und das Gerät lädt mit 1200 W weiter, auch im Standby. | Ja, `controller.py` `_system` hat dieselbe Struktur. Eigener Fix offen. |
+| #317 | SoC-Schutz stoppt das Laden nicht: Der Stopp-Pfad (Leistung auf 0 W, wenn der Ladestand das Minimum erreicht) hängt hinter der Bedingung „Tageslicht oder Einspeisung“ und prüft exakte Gleichheit des Ladestands. Fällt die Bedingung während des Ladens weg, wird das Minimum übersprungen und das Gerät lädt mit 1200 W weiter, auch im Standby. Zweite Ursache (Kommentar 2026-11-10, SF 800 Plus): Das Gerät meldet nach `inputLimit: 1200` z. B. 1000 zurück, der Stopp verlangt aber genau 1200. | Bei uns behoben in 1.4.0, siehe „Bewusste Abweichungen“. |
 | #275 | Der AC-Port bleibt nach einem kurzen Ladebefehl auf Laden (`acMode=1`) hängen, Smart Matching versorgt das Haus dann nicht mehr. Die Entladung wird nur gesendet, wenn sich die Leistung ändert, nicht wenn die Richtung falsch ist. | Möglich. Beim Entladen-Ausgleich schreiben wir nur `outputLimit`. Gerät-seitig, noch unbestätigt. |
 | #183 | `sensor.zendure_power` zeigt bei PV-Betrieb teils die falsche Richtung (Ableitung aus `pass`). | Gleiche Formel in `coordinator.py` (`power`). Betrifft Anlagen mit PV. |
 | #328 | Smart Matching bei SoC genau = Min-SoC: Der Entladen-Ausgleich verlangt SoC > Min, die Entladeleistung bleibt deshalb auf dem letzten Wert stehen. „Laden starten“ verlangt eine ruhende Batterie, also wird bei PV-Überschuss minutenlang weiter entladen und eingespeist, bis das BMS stoppt. Vorschlag im Issue: bei SoC <= Min nur noch herunterregeln bzw. `outputLimit` 0, wenn Einspeisung unter „Start Charging At“. Gemeldet auf einem SF 4000 Mix AC+. | Ja, `_smart` hat dieselben Bedingungen (`can_discharge` mit `soc > min_soc`). Eigener Fix offen. |
@@ -169,6 +169,11 @@ sondern bei einer Änderung des Originals bewusst entscheiden.
 - Alle Bedingungen und Regeln mit `dynamic_*` (Dynamic-Modi, „Dynamic charging/discharging check“,
   `dynamic_charging_running`, `dynamic_discharging_running`, Nordpool-Sensoren) fehlen. Wo sie im Original
   „aus“ sein müssen, ist die Bedingung bei uns immer erfüllt.
+- SoC-Schutz (Laden bis Min-SoC, Original-Issue #317): Ein Merker `_protection_charging` hält fest, dass der
+  Schutz lädt. Der Stopp (`inputLimit` 0) greift bei SoC >= Min-SoC unabhängig von Tageslicht/Einspeisung und
+  vom zurückgemeldeten `inputLimit`. Die Stopp-Bedingung des Originals (SoC gerundet = Min, Ladeleistung 1200 W)
+  gilt zusätzlich, für den Fall eines Neustarts während des Schutzladens. 1200 W wird nur geschrieben, wenn der
+  Schutz noch nicht lädt oder das Gerät 0 W meldet, nicht bei jeder Abweichung des zurückgemeldeten Werts.
 - *Manual* bei 0 W: Das Original hat zwei Regeln, die bei 0 W abwechselnd greifen (Laden und Entladen
   umschalten). Bei uns: positiv = laden, negativ = entladen, 0 = stoppen. Geprüft wird nur das jeweils
   relevante Limit (das andere bliebe sonst bei jedem Durchlauf ungleich und würde endlos geschrieben).

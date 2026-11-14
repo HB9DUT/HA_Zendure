@@ -96,4 +96,4 @@ PACK_CAPACITY = {
     500: 2.40,
 }
 MIX_PRODUCTS = ("solarFlow4000MixAC+", "solarFlow4000MixPro", "solarFlow3000MixAC+")
-MIX_PACK_CAPACITY = {70: 8.00}
+MIX_PACK_CAPACITY = {**PACK_CAPACITY, 70: 8.00, 280: 2.88}

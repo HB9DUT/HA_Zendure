@@ -108,6 +108,7 @@ class ZendureController:
         self._last_charging_mode: str | None = None
         self._charging_mode_since = time.monotonic()
         self._lock_armed = True
+        self._protection_charging = False
         self._ready = False
 
     # -- lifecycle -----------------------------------------------------------
@@ -315,23 +316,35 @@ class ZendureController:
 
         # Charge up to the minimum SoC (protection)
         min_soc = c.device_min_soc
-        if (
-            not self.get(SETTING_SOC_PROTECTION_DISABLED)
-            and mode in (MODE_STANDBY, *SMART_MODES)
-            and (
-                soc < min_soc
-                or (round(soc) == round(min_soc) and set_charge == 1200)
-            )
-            and (
-                self._daylight()
-                or (meter is not None and meter < self.get(SETTING_START_CHARGING_AT))
-            )
+        protection = not self.get(SETTING_SOC_PROTECTION_DISABLED) and mode in (
+            MODE_STANDBY,
+            *SMART_MODES,
+        )
+        if not protection:
+            self._protection_charging = False
+        # Stop path (upstream #317): independent of daylight/export and of the
+        # exact read-back value (some devices report e.g. 1000 instead of 1200).
+        # The second condition is the original one, it covers a restart.
+        elif soc >= min_soc and (
+            self._protection_charging
+            or (round(soc) == round(min_soc) and set_charge == 1200)
         ):
-            limit = 1200 if soc < min_soc else 0
-            if set_charge != limit:
+            self._protection_charging = False
+            if set_charge != 0:
                 await self._write(
-                    {"acMode": 1, "inputLimit": limit},
-                    f"Battery SoC protection active, charge power {limit} W",
+                    {"acMode": 1, "inputLimit": 0},
+                    "Battery SoC protection active, charge power 0 W",
+                )
+            return
+        elif soc < min_soc and (
+            self._daylight()
+            or (meter is not None and meter < self.get(SETTING_START_CHARGING_AT))
+        ):
+            if not self._protection_charging or set_charge == 0:
+                self._protection_charging = True
+                await self._write(
+                    {"acMode": 1, "inputLimit": 1200},
+                    "Battery SoC protection active, charge power 1200 W",
                 )
             return
 

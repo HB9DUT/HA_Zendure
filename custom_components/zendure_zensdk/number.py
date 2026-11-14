@@ -10,6 +10,7 @@ from . import ZendureConfigEntry
 from .const import (
     SETTING_CHARGE_BUFFER,
     SETTING_DISCHARGE_BUFFER,
+    SETTING_DISCHARGE_LOCK_RELEASE_SOC,
     SETTING_MANUAL_POWER,
     SETTING_MAX_CHARGE_POWER,
     SETTING_MAX_DISCHARGE_POWER,
@@ -36,6 +37,7 @@ NAMES = {
     SETTING_MANUAL_POWER: ("Manual Power", "mdi:flash"),
     SETTING_MIN_SOC: ("Minimum Allowed State Of Charge", "mdi:percent-box"),
     SETTING_MAX_SOC: ("Maximum Allowed State Of Charge", "mdi:percent-box"),
+    SETTING_DISCHARGE_LOCK_RELEASE_SOC: ("Discharge Lock Release SoC", "mdi:battery-unlock"),
 }
 
 

@@ -58,6 +58,7 @@ SETTING_MANUAL_POWER = "manual_power"
 SETTING_SOC_PROTECTION_DISABLED = "soc_protection_disabled"
 SETTING_PV_EXPORT_DISABLED = "pv_export_disabled"
 SETTING_DISCHARGE_LOCK = "discharge_lock"
+SETTING_DISCHARGE_LOCK_RELEASE_SOC = "discharge_lock_release_soc"
 SETTING_FULL_CYCLE_AUTO = "full_cycle_auto"
 SETTING_MODE = "mode"
 

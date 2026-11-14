@@ -37,6 +37,7 @@ from .const import (
     SETTING_CHARGE_BUFFER,
     SETTING_DISCHARGE_BUFFER,
     SETTING_DISCHARGE_LOCK,
+    SETTING_DISCHARGE_LOCK_RELEASE_SOC,
     SETTING_FULL_CYCLE_AUTO,
     SETTING_MANUAL_POWER,
     SETTING_MAX_CHARGE_POWER,
@@ -68,6 +69,7 @@ NUMBER_SPECS: dict[str, tuple[float, float, float, str]] = {
     SETTING_MANUAL_POWER: (-12000, 12000, 1, "W"),
     SETTING_MIN_SOC: (5, 50, 1, "%"),
     SETTING_MAX_SOC: (70, 100, 1, "%"),
+    SETTING_DISCHARGE_LOCK_RELEASE_SOC: (80, 100, 1, "%"),
 }
 
 # Settings that are mirrored to the device itself
@@ -141,6 +143,7 @@ class ZendureController:
             SETTING_MANUAL_POWER: 0,
             SETTING_SOC_PROTECTION_DISABLED: False,
             SETTING_DISCHARGE_LOCK: False,
+            SETTING_DISCHARGE_LOCK_RELEASE_SOC: 100,
             SETTING_FULL_CYCLE_AUTO: True,
             SETTING_PV_EXPORT_DISABLED: int(_f(p.get("gridReverse"))) == 2,
             **RECOMMENDED_DEFAULTS,
@@ -396,7 +399,7 @@ class ZendureController:
 
     async def _discharge_lock(self) -> None:
         """Set the discharge lock at min SoC (if the full cycle automatic is on),
-        lift it again at max SoC.
+        lift it again at the release SoC (capped at max SoC).
 
         Setting it is edge triggered: once the lock has been set (or the SoC
         is still at the minimum), it is only set again after the SoC has risen
@@ -406,6 +409,7 @@ class ZendureController:
         soc = c.soc
         min_soc = c.device_min_soc
         max_soc = c.device_max_soc or 100.0
+        release_soc = min(float(self.get(SETTING_DISCHARGE_LOCK_RELEASE_SOC)), max_soc)
         if soc > min_soc:
             self._lock_armed = True
         if not self.get(SETTING_DISCHARGE_LOCK):
@@ -417,11 +421,11 @@ class ZendureController:
             return
         if soc <= min_soc:
             self._lock_armed = False
-        full = soc >= max_soc or c.soc_limit_status == "Charging Limit Reached"
+        full = soc >= release_soc or c.soc_limit_status == "Charging Limit Reached"
         calibrating = int(_f(c.props.get("socStatus"))) == 1
         if full and not calibrating:
             await self.async_set(SETTING_DISCHARGE_LOCK, False)
-            self._log(f"Maximum SoC {int(max_soc)} % reached, discharge lock released")
+            self._log(f"SoC {int(release_soc)} % reached, discharge lock released")
 
     async def _smart(self, meter: float | None) -> None:
         """Smart Matching control; first matching rule wins."""

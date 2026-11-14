@@ -76,7 +76,8 @@ Netzmesser nach einer Minute, AC-Passthrough für den Off-Grid-Ausgang und der A
 Min/Max-SoC, max. Lade-/Entladeleistung und PV-Export mit dem Gerät.
 
 Nicht im Original: Der Schalter `Discharge Lock Until Full` sperrt das Entladen in den Smart-Modi. Er
-schaltet sich aus, wenn der Akku den maximalen erlaubten SoC erreicht. Mit dem Schalter
+schaltet sich aus, wenn der Akku `Discharge Lock Release SoC` erreicht (Standard 100 %, z. B. 80 % für eine
+frühere Freigabe; nie über dem maximalen erlaubten SoC). Mit dem Schalter
 `Full Cycle Automatic` (standardmässig an) schaltet er sich zusätzlich ein, wenn der Akku den minimalen
 erlaubten SoC erreicht. So läuft der Akku immer einen vollen Hub, bevor wieder entladen wird.
 Die Sperre lässt sich auch von Hand schalten (z. B. ein zur Kalibrierung). Schaltest du ihn beim minimalen SoC von

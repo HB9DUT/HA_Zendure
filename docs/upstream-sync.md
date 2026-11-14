@@ -193,8 +193,9 @@ sondern bei einer Änderung des Originals bewusst entscheiden.
   Entladung wird gestoppt (`outputLimit` 0). Laden läuft normal. Der Schalter ist unabhängig vom Modus,
   damit Automationen (z. B. Heizung/BEV: Smart Charge Only und zurück) ihn nicht aufheben. Ist der Schalter
   **Full Cycle Automatic** (`switch.zendure_full_cycle_automatic`, Standard an) an, geht die Sperre von selbst
-  an, sobald der SoC den Min-SoC des Geräts (`minSoc`) erreicht. Sie geht immer von selbst aus, sobald der SoC den
-  Max-SoC (`socSet`) erreicht oder „Charging Limit Reached“ meldet und keine Kalibrierung läuft (voller Hub
+  an, sobald der SoC den Min-SoC des Geräts (`minSoc`) erreicht. Sie geht immer von selbst aus, sobald der SoC
+  `number.zendure_discharge_lock_release_soc` (Standard 100 %, 80–100 %, begrenzt auf den Max-SoC `socSet`;
+  nicht Teil von `RECOMMENDED_DEFAULTS`) erreicht oder „Charging Limit Reached“ meldet und keine Kalibrierung läuft (voller Hub
   vor dem nächsten Entladen). Das Einschalten ist flankengesteuert (`_lock_armed`): Wer ihn beim Min-SoC
   von Hand ausschaltet, behält das, bis der SoC wieder über dem Minimum war. Nach einem Neustart ist er
   „scharf“; steht der SoC dann am Minimum, geht er an. Manual und Quick Discharge sind bewusst nicht gesperrt.
@@ -217,8 +218,8 @@ sondern bei einer Änderung des Originals bewusst entscheiden.
   weil die Marken in den Karten bei 0 statt am Wert standen.
 - Der Heartbeat der Geräte-Karte nutzt `last_reported` von `sensor.zendure_power`.
 - Die Gerätebilder liefert die Integration selbst unter `/zendure_zensdk/`.
-- Die Schalter `Discharge Lock Until Full` und `Full Cycle Automatic` werden nach `SOC Protection Disabled`
-  eingefügt (`extra_entities`).
+- Die Schalter `Discharge Lock Until Full` und `Full Cycle Automatic` sowie die Zahl
+  `Discharge Lock Release SoC` werden nach `SOC Protection Disabled` eingefügt (`extra_entities`).
 
 ## Entwicklungsumgebung
 
